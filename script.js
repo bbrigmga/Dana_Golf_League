@@ -2,17 +2,57 @@ let teams = [];
 let roundRobinMatches = [];
 let bracketMatches = [];
 
+function getInitialTeams() {
+    // Get teams from localStorage or use default teams
+    const savedTeams = localStorage.getItem('golfTeams');
+    if (savedTeams) {
+        return JSON.parse(savedTeams);
+    }
+    
+    // Default teams if none in storage
+    return [
+        {
+            id: 1,
+            team_name: "BTFD",
+            team_members: "Garrett Brigman & John Mueller",
+            round_1: null,
+            round_2: null,
+            round_3: null
+        },
+        {
+            id: 2,
+            team_name: "Master Market Jedi's",
+            team_members: "Mike Honkamp & Brian Lehky",
+            round_1: null,
+            round_2: null,
+            round_3: null
+        },
+        {
+            id: 3,
+            team_name: "Leverage Legends",
+            team_members: "Steve Jaeger & Alton Wigly",
+            round_1: null,
+            round_2: null,
+            round_3: null
+        },
+        {
+            id: 4,
+            team_name: "Cap Gains Gang",
+            team_members: "Perry Pocaro & Jim Mirsberger",
+            round_1: null,
+            round_2: null,
+            round_3: null
+        }
+    ];
+}
+
 async function fetchLeaderboard() {
     try {
-        const response = await fetch('http://localhost:3000/api/teams');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Fetched data:', data); // Debug log
+        const data = getInitialTeams();
+        console.log('Loaded teams:', data);
         return data;
     } catch (error) {
-        console.error('Error fetching leaderboard:', error);
+        console.error('Error loading teams:', error);
         return [];
     }
 }
@@ -86,37 +126,35 @@ async function displayLeaderboard() {
 
 function generateRoundRobinSchedule() {
     roundRobinMatches = [];
-    const n = teams.length;
+    
+    // Get unique teams (in case of duplicates) and filter out BYE
+    const uniqueTeams = Array.from(new Set(teams.map(t => t.name)))
+        .filter(name => name !== "BYE")
+        .map(name => ({ name }));
     
     // If odd number of teams, add a "bye" team
-    if (n % 2 !== 0) {
-        teams.push({ name: "BYE", members: "", scores: [], wins: 0 });
+    if (uniqueTeams.length % 2 !== 0) {
+        uniqueTeams.push({ name: "BYE" });
     }
     
-    const numTeams = teams.length;
-    const numRounds = numTeams - 1;
-    const halfSize = numTeams / 2;
+    const n = uniqueTeams.length;
+    const rounds = n - 1;
+    const half = n / 2;
     
-    // Generate array of team indices
-    let teamIndices = Array.from({length: numTeams}, (_, i) => i);
-    
-    // For each round
-    for (let round = 0; round < numRounds; round++) {
-        let roundMatches = [];
+    // Generate rounds using Circle Method
+    for (let round = 0; round < rounds; round++) {
+        const roundMatches = [];
         
-        // First team stays fixed, others rotate
-        const firstTeam = teamIndices[0];
-        
-        // Generate pairings for this round
-        for (let i = 0; i < halfSize; i++) {
-            const team1Idx = teamIndices[i];
-            const team2Idx = teamIndices[numTeams - 1 - i];
+        // Pair teams for this round
+        for (let i = 0; i < half; i++) {
+            const team1 = uniqueTeams[i];
+            const team2 = uniqueTeams[n - 1 - i];
             
-            // Don't create matches with BYE team
-            if (teams[team1Idx].name !== "BYE" && teams[team2Idx].name !== "BYE" && team1Idx !== team2Idx) {
+            // Only create match if neither team is BYE
+            if (team1.name !== "BYE" && team2.name !== "BYE") {
                 roundMatches.push({
-                    team1: teams[team1Idx].name,
-                    team2: teams[team2Idx].name,
+                    team1: team1.name,
+                    team2: team2.name,
                     score1: null,
                     score2: null,
                     round: round + 1
@@ -124,12 +162,8 @@ function generateRoundRobinSchedule() {
             }
         }
         
-        // Rotate teams for next round (except first team)
-        teamIndices = [
-            teamIndices[0],
-            ...teamIndices.slice(2),
-            teamIndices[1]
-        ];
+        // Rotate teams for next round (first position is fixed)
+        uniqueTeams.splice(1, 0, uniqueTeams.pop());
         
         roundRobinMatches.push(...roundMatches);
     }
