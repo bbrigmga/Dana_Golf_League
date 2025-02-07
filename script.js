@@ -2,72 +2,32 @@ let teams = [];
 let roundRobinMatches = [];
 let bracketMatches = [];
 
-function getInitialTeams() {
-    // Try to get teams from Firebase
-    const savedTeams = localStorage.getItem('golfTeams');
-    if (savedTeams) {
-        return JSON.parse(savedTeams);
-    }
-    
-    // Default teams if none in storage
-    return [
-        {
-            id: 1,
-            team_name: "BTFD",
-            team_members: "Garrett Brigman & John Mueller",
-            round_1: null,
-            round_2: null,
-            round_3: null
-        },
-        {
-            id: 2,
-            team_name: "Master Market Jedi's",
-            team_members: "Mike Honkamp & Brian Lehky",
-            round_1: null,
-            round_2: null,
-            round_3: null
-        },
-        {
-            id: 3,
-            team_name: "Leverage Legends",
-            team_members: "Steve Jaeger & Alton Wigly",
-            round_1: null,
-            round_2: null,
-            round_3: null
-        },
-        {
-            id: 4,
-            team_name: "Cap Gains Gang",
-            team_members: "Perry Pocaro & Jim Mirsberger",
-            round_1: null,
-            round_2: null,
-            round_3: null
-        }
-    ];
-}
-
 async function fetchLeaderboard() {
     try {
-        const data = getInitialTeams();
+        const response = await fetch('scores.csv');
+        const csvText = await response.text();
+        const rows = csvText.split('\n');
+        const headers = rows[0].split(',');
+        
+        // Parse CSV into team data
+        const data = rows.slice(1).filter(row => row.trim()).map(row => {
+            const values = row.split(',');
+            const team = {
+                team_name: values[0],
+                team_members: values[1]
+            };
+            // Add round scores
+            for (let i = 2; i < values.length; i++) {
+                team[`round_${i-1}`] = values[i] ? parseInt(values[i]) : null;
+            }
+            return team;
+        });
+        
         console.log('Loaded teams:', data);
         return data;
     } catch (error) {
         console.error('Error loading teams:', error);
         return [];
-    }
-}
-
-function updateScore(teamName, roundIndex, newScore) {
-    // Find the team in the data
-    const data = getInitialTeams();
-    const team = data.find(t => t.team_name === teamName);
-    if (team) {
-        // Update the score for the specific round
-        team[`round_${roundIndex + 1}`] = newScore ? parseInt(newScore) : null;
-        // Save back to localStorage
-        localStorage.setItem('golfTeams', JSON.stringify(data));
-        // Refresh the display
-        displayLeaderboard();
     }
 }
 
@@ -88,7 +48,6 @@ async function displayLeaderboard() {
         }
 
         return {
-            id: row.id,
             name: row.team_name,
             members: row.team_members,
             scores: scores,
@@ -129,14 +88,8 @@ async function displayLeaderboard() {
             <td>${team.name}</td>
             <td>${team.members}</td>
             <td>${team.totalScore}</td>
-            ${team.scores.map((score, idx) => 
-                `<td><input type="number" value="${score || ''}" 
-                    onchange="updateScore('${team.name}', ${idx}, this.value)"
-                    class="score-input"></td>`
-            ).join('')}
-            ${Array(10 - team.scores.length)
-                .fill('<td><input type="number" class="score-input" disabled></td>')
-                .join('')}
+            ${team.scores.map(score => `<td>${score || '-'}</td>`).join('')}
+            ${Array(10 - team.scores.length).fill('<td>-</td>').join('')}
         `;
         leaderboardBody.appendChild(tr);
     });

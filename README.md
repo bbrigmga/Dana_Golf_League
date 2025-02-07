@@ -6,7 +6,7 @@ A simple web application to manage and display the office golf league tournament
 - Displays team rankings and scores
 - Generates round robin tournament schedule
 - Automatically creates championship brackets
-- No server required - works entirely in the browser
+- Reads scores directly from CSV file
 
 ## Setup as GitHub Page
 
@@ -15,7 +15,8 @@ A simple web application to manage and display the office golf league tournament
    - index.html
    - script.js
    - styles.css
-   - Logo.jpg (if you want to keep the logo)
+   - scores.csv
+   - logo.jpg (if you want to keep the logo)
 
 3. Enable GitHub Pages:
    - Go to repository Settings
@@ -25,17 +26,38 @@ A simple web application to manage and display the office golf league tournament
 
 4. Your site will be available at: `https://[your-username].github.io/[repository-name]`
 
+## Updating Scores
+
+1. Edit scores.csv directly in GitHub:
+   - Go to scores.csv in your repository
+   - Click the pencil icon to edit
+   - Update scores for each round
+   - Commit changes
+
+2. Or update locally and push:
+   - Edit scores.csv on your computer
+   - Commit and push changes to GitHub
+   ```bash
+   git add scores.csv
+   git commit -m "Updated scores for round X"
+   git push
+   ```
+
+## CSV Format
+scores.csv follows this format:
+```csv
+team_name,team_members,round_1,round_2,round_3
+BTFD,Garrett Brigman & John Mueller,,,
+Master Market Jedi's,Mike Honkamp & Brian Lehky,,,
+```
+
+- Leave scores empty (,,) for rounds not yet played
+- Only enter numbers for scores (no text)
+- Don't add extra spaces after commas
+
 ## Local Development
 
-To run locally, simply open `index.html` in your web browser. No server setup required!
-
-## How it Works
-- Team data is stored in browser's local storage
-- Round robin scheduling ensures each team plays against every other team exactly once
-- Scores can be updated and will persist between sessions
-- Championship bracket is generated based on team performance
-
-## Updating Teams or Scores
-- Team data is initialized with default values
-- Scores are saved in your browser's local storage
-- Clear your browser data to reset scores
+To run locally:
+1. Open index.html in your web browser
+2. Edit scores.csv as needed
+3. Refresh the page to see updates
