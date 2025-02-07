@@ -3,7 +3,7 @@ let roundRobinMatches = [];
 let bracketMatches = [];
 
 function getInitialTeams() {
-    // Get teams from localStorage or use default teams
+    // Try to get teams from Firebase
     const savedTeams = localStorage.getItem('golfTeams');
     if (savedTeams) {
         return JSON.parse(savedTeams);
@@ -57,6 +57,20 @@ async function fetchLeaderboard() {
     }
 }
 
+function updateScore(teamName, roundIndex, newScore) {
+    // Find the team in the data
+    const data = getInitialTeams();
+    const team = data.find(t => t.team_name === teamName);
+    if (team) {
+        // Update the score for the specific round
+        team[`round_${roundIndex + 1}`] = newScore ? parseInt(newScore) : null;
+        // Save back to localStorage
+        localStorage.setItem('golfTeams', JSON.stringify(data));
+        // Refresh the display
+        displayLeaderboard();
+    }
+}
+
 async function displayLeaderboard() {
     const leaderboardBody = document.getElementById('leaderboardBody');
     leaderboardBody.innerHTML = '';
@@ -64,7 +78,7 @@ async function displayLeaderboard() {
     const data = await fetchLeaderboard();
     if (!data || data.length === 0) return;
 
-    // Map the SQLite data to our team structure
+    // Map the data to our team structure
     teams = data.map(row => {
         // Extract round scores from the row
         const scores = [];
@@ -115,8 +129,14 @@ async function displayLeaderboard() {
             <td>${team.name}</td>
             <td>${team.members}</td>
             <td>${team.totalScore}</td>
-            ${team.scores.map(score => `<td>${score || '-'}</td>`).join('')}
-            ${Array(10 - team.scores.length).fill('<td>-</td>').join('')}
+            ${team.scores.map((score, idx) => 
+                `<td><input type="number" value="${score || ''}" 
+                    onchange="updateScore('${team.name}', ${idx}, this.value)"
+                    class="score-input"></td>`
+            ).join('')}
+            ${Array(10 - team.scores.length)
+                .fill('<td><input type="number" class="score-input" disabled></td>')
+                .join('')}
         `;
         leaderboardBody.appendChild(tr);
     });

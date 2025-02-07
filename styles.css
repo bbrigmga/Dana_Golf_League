@@ -11,29 +11,29 @@ body {
 }
 
 .logo {
-    max-width: 400px;
+    max-width: 300px;
     height: auto;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
+    color: #333;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 th, td {
-    border: 1px solid #ddd;
-    padding: 12px;
+    padding: 10px;
     text-align: center;
+    border: 1px solid #ddd;
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #f5f5f5;
     font-weight: bold;
 }
 
@@ -41,53 +41,65 @@ tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-#roundRobin, #bracket {
-    margin-top: 40px;
-}
-
 .match {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 4px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
 }
 
-.match span {
-    flex: 1;
-    text-align: center;
-}
-
-.match .vs {
-    flex: 0.5;
+.vs {
+    margin: 0 20px;
     font-weight: bold;
     color: #666;
 }
 
 .bracket-round {
-    display: flex;
-    justify-content: space-around;
     margin: 20px 0;
 }
 
 .bracket-match {
-    background: #fff;
-    border: 1px solid #ddd;
+    margin: 10px 0;
     padding: 10px;
-    margin: 5px;
-    border-radius: 4px;
-    min-width: 200px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
     text-align: center;
 }
 
-.winner {
-    background-color: #e8f5e9;
-    font-weight: bold;
+/* New styles for score inputs */
+.score-input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.score-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.score-input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
