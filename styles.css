@@ -11,7 +11,7 @@ body {
 }
 
 .logo {
-    max-width: 200px;
+    max-width: 400px;
     height: auto;
 }
 
@@ -43,4 +43,51 @@ tr:nth-child(even) {
 
 tr:hover {
     background-color: #f1f1f1;
+}
+
+#roundRobin, #bracket {
+    margin-top: 40px;
+}
+
+.match {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.match span {
+    flex: 1;
+    text-align: center;
+}
+
+.match .vs {
+    flex: 0.5;
+    font-weight: bold;
+    color: #666;
+}
+
+.bracket-round {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.bracket-match {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 4px;
+    min-width: 200px;
+    text-align: center;
+}
+
+.winner {
+    background-color: #e8f5e9;
+    font-weight: bold;
 }
