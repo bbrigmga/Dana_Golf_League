@@ -2,47 +2,48 @@ let teams = [];
 let roundRobinMatches = [];
 let bracketMatches = [];
 
-async function fetchLeaderboard() {
-    try {
-        const response = await fetch('scores.csv');
-        const csvText = await response.text();
-        const rows = csvText.split('\n');
-        const headers = rows[0].split(',');
-        
-        // Parse CSV into team data
-        const data = rows.slice(1).filter(row => row.trim()).map(row => {
-            const values = row.split(',');
-            const team = {
-                team_name: values[0],
-                team_members: values[1]
-            };
-            // Add round scores
-            for (let i = 2; i < values.length; i++) {
-                team[`round_${i-1}`] = values[i] ? parseInt(values[i]) : null;
-            }
-            return team;
-        });
-        
-        console.log('Loaded teams:', data);
-        return data;
-    } catch (error) {
-        console.error('Error loading teams:', error);
-        return [];
-    }
+function fetchLeaderboard() {
+    // Hardcode the current scores.csv content
+    const csvContent = `"team_name","team_members","round_1","round_2","round_3"
+"BTFD","Garrett Brigman & John Mueller","5","0","0"
+"Master Market Jedi's","Mike Honkamp & Brian Lehky","10","0","0"
+"Leverage Legends","Steve Jaeger & Alton Wigly","8","0","0"
+"Cap Gains Gang","Perry Pocaro & Jim Mirsberger","13","0","0"`;
+
+    const rows = csvContent.split('\n');
+    const headers = rows[0].split(',').map(h => h.replace(/"/g, ''));
+    
+    // Parse CSV into team data
+    const data = rows.slice(1).filter(row => row.trim()).map(row => {
+        // Split by comma but handle quoted values
+        const values = row.split(',').map(v => v.replace(/"/g, ''));
+        const team = {
+            team_name: values[0],
+            team_members: values[1]
+        };
+        // Add round scores
+        for (let i = 2; i < values.length; i++) {
+            team[`round_${i-1}`] = values[i] ? parseInt(values[i]) : null;
+        }
+        return team;
+    });
+    
+    console.log('Loaded teams:', data);
+    return data;
 }
 
-async function displayLeaderboard() {
+function displayLeaderboard() {
     const leaderboardBody = document.getElementById('leaderboardBody');
     leaderboardBody.innerHTML = '';
 
-    const data = await fetchLeaderboard();
+    const data = fetchLeaderboard();
     if (!data || data.length === 0) return;
 
     // Map the data to our team structure
     teams = data.map(row => {
         // Extract round scores from the row
         const scores = [];
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 5; i++) {
             const score = row[`round_${i}`];
             scores.push(score ? parseInt(score) : null);
         }
@@ -89,7 +90,7 @@ async function displayLeaderboard() {
             <td>${team.members}</td>
             <td>${team.totalScore}</td>
             ${team.scores.map(score => `<td>${score || '-'}</td>`).join('')}
-            ${Array(10 - team.scores.length).fill('<td>-</td>').join('')}
+            ${Array(5 - team.scores.length).fill('<td>-</td>').join('')}
         `;
         leaderboardBody.appendChild(tr);
     });
@@ -111,7 +112,8 @@ function generateRoundRobinSchedule() {
     }
     
     const n = uniqueTeams.length;
-    const rounds = n - 1;
+    // Limit to 3 rounds for round robin phase
+    const rounds = Math.min(3, n - 1);
     const half = n / 2;
     
     // Generate rounds using Circle Method
@@ -224,9 +226,9 @@ function displayBracket() {
     });
 }
 
-async function init() {
+function init() {
     try {
-        await displayLeaderboard();
+        displayLeaderboard();
         // Show bracket button after round robin is complete
         const bracketBtn = document.createElement('button');
         bracketBtn.textContent = 'Generate Championship Bracket';
@@ -238,4 +240,4 @@ async function init() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => init().catch(console.error));
+document.addEventListener('DOMContentLoaded', init);
