@@ -5,10 +5,10 @@ let bracketMatches = [];
 function fetchLeaderboard() {
     // Hardcode the current scores.csv content
     const csvContent = `"team_name","team_members","round_1","round_2","round_3"
-"BTFD","Garrett Brigman & John Mueller","5","0","0"
-"Master Market Jedi's","Mike Honkamp & Brian Lehky","10","0","0"
-"Leverage Legends","Steve Jaeger & Alton Wigly","8","0","0"
-"Cap Gains Gang","Perry Pocaro & Jim Mirsberger","13","0","0"`;
+"BTFD","Garrett Brigman & John Mueller","0","0","0"
+"Master Market Jedi's","Mike Honkamp & Brian Lehky","0","0","0"
+"Leverage Legends","Steve Jaeger & Alton Wigly","0","0","0"
+"Cap Gains Gang","Perry Pocaro & Jim Mirsberger","0","0","0"`;
 
     const rows = csvContent.split('\n');
     const headers = rows[0].split(',').map(h => h.replace(/"/g, ''));
