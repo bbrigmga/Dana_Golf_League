@@ -33,6 +33,8 @@ A simple web application to manage and display the office golf league tournament
    - Click the pencil icon to edit
    - Update scores for each round
    - Commit changes
+   - Wait for the GitHub Actions workflow to complete (check Actions tab)
+   - Your changes will be live on the GitHub Pages site
 
 2. Or update locally and push:
    - Edit scores.csv on your computer
@@ -42,6 +44,14 @@ A simple web application to manage and display the office golf league tournament
    git commit -m "Updated scores for round X"
    git push
    ```
+   - Wait for the GitHub Actions workflow to complete (check Actions tab)
+   - Your changes will be live on the GitHub Pages site
+
+Note: After pushing changes, you can monitor the deployment:
+1. Go to the repository's "Actions" tab
+2. Look for the latest "Deploy to GitHub Pages" workflow run
+3. Once it shows a green checkmark, your changes are live
+4. You may need to do a hard refresh (Ctrl+F5) in your browser to see the updates
 
 ## CSV Format
 scores.csv follows this format:
