@@ -2,41 +2,41 @@ let teams = [];
 let roundRobinMatches = [];
 let bracketMatches = [];
 
-function fetchLeaderboard() {
-    // Hardcode the current scores.csv content
-    const csvContent = `"team_name","team_members","round_1","round_2","round_3"
-"BTFD","Garrett Brigman & John Mueller","0","0","0"
-"Master Market Jedi's","Mike Honkamp & Brian Lehky","0","0","0"
-"Leverage Legends","Steve Jaeger & Alton Wigly","0","0","0"
-"Cap Gains Gang","Perry Pocaro & Jim Mirsberger","0","0","0"`;
-
-    const rows = csvContent.split('\n');
-    const headers = rows[0].split(',').map(h => h.replace(/"/g, ''));
-    
-    // Parse CSV into team data
-    const data = rows.slice(1).filter(row => row.trim()).map(row => {
-        // Split by comma but handle quoted values
-        const values = row.split(',').map(v => v.replace(/"/g, ''));
-        const team = {
-            team_name: values[0],
-            team_members: values[1]
-        };
-        // Add round scores
-        for (let i = 2; i < values.length; i++) {
-            team[`round_${i-1}`] = values[i] ? parseInt(values[i]) : null;
-        }
-        return team;
-    });
-    
-    console.log('Loaded teams:', data);
-    return data;
+async function fetchLeaderboard() {
+    try {
+        const response = await fetch('scores.csv');
+        const csvContent = await response.text();
+        const rows = csvContent.split('\n');
+        const headers = rows[0].split(',').map(h => h.replace(/"/g, ''));
+        
+        // Parse CSV into team data
+        const data = rows.slice(1).filter(row => row.trim()).map(row => {
+            // Split by comma but handle quoted values
+            const values = row.split(',').map(v => v.replace(/"/g, ''));
+            const team = {
+                team_name: values[0],
+                team_members: values[1]
+            };
+            // Add round scores
+            for (let i = 2; i < values.length; i++) {
+                team[`round_${i-1}`] = values[i] ? parseInt(values[i]) : null;
+            }
+            return team;
+        });
+        
+        console.log('Loaded teams:', data);
+        return data;
+    } catch (error) {
+        console.error('Error loading scores:', error);
+        return [];
+    }
 }
 
-function displayLeaderboard() {
+async function displayLeaderboard() {
     const leaderboardBody = document.getElementById('leaderboardBody');
     leaderboardBody.innerHTML = '';
 
-    const data = fetchLeaderboard();
+    const data = await fetchLeaderboard();
     if (!data || data.length === 0) return;
 
     // Map the data to our team structure
@@ -226,9 +226,9 @@ function displayBracket() {
     });
 }
 
-function init() {
+async function init() {
     try {
-        displayLeaderboard();
+        await displayLeaderboard();
         // Show bracket button after round robin is complete
         const bracketBtn = document.createElement('button');
         bracketBtn.textContent = 'Generate Championship Bracket';
